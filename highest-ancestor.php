@@ -2,17 +2,14 @@
 /**
  * cnp_get_highest_ancestor
  *
- * Gets information not about the current post, but
- * about the most distant ancestor of the current post.
+ * Gets information about the most distant ancestor of the current post.
  * Useful when displaying section information.
  *
  * Current page and expected behavior:
+ * hierarchical post type highest ancestor if nested, current page if top-level
+ * flat post type         check for page with post type name, otherwise return post type information
  * front page             page_on_front information
  * home page              page_for_posts information
- * post single            page_for_posts information
- * page singular          highest ancestor if nested, current page if top-level
- * post type archive      check for page with post type name, otherwise return post type information
- * post type singular     check for page with post type name, otherwise return post type information
  * taxonomy archive       not accessible (e.g., /genres results in a 404, /genres/mystery-novels gives results)
  * taxonomy term archive  taxonomy term name (e.g., "Mystery Novels")
  * search results         check for page with slug of "search", otherwise return standard search results information
@@ -65,7 +62,7 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 		'check_for_page' => TRUE,
 		'post_type_pages' => array(
 			'search' => 'search',
-			'404' => '404'
+			'404'    => '404'
 		)
 	);
 	$vars = wp_parse_args( $args, $defaults );
@@ -329,7 +326,7 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 	——————————————————————————————————————————————————————————*/
 
 	// Filter check
-	$ancestor = apply_filters( 'cnp_highest_ancestor', $ancestor );
+	$ancestor = apply_filters( 'cnp_get_highest_ancestor', $ancestor );
 
 	return $ancestor;
 

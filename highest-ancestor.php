@@ -137,7 +137,27 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 
 			// The highest level ancestor is returned as the last
 			// value in the array, so we take that with array_pop.
-			$ancestor_id = array_pop( $ancestor_ids_arr );
+			if ( ! empty( $ancestor_ids_arr ) ) {
+
+				$ancestor_id       = array_pop( $ancestor_ids_arr );
+				$ancestor_post_obj = get_post( $ancestor_id );
+
+				$ancestor = array(
+					'id'     => $ancestor_post_obj->ID,
+					'title'  => $ancestor_post_obj->post_title,
+					'name'   => $ancestor_post_obj->post_name,
+					'object' => $ancestor_post_obj,
+				);
+
+			} else {
+
+				$ancestor = array(
+					'id'     => $post->ID,
+					'title'  => $post->post_title,
+					'name'   => $post->post_name,
+					'object' => $post
+				);
+			}
 
 			break;
 

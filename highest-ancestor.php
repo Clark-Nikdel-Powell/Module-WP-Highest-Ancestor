@@ -27,51 +27,52 @@
  * @link https://codex.wordpress.org/Function_Reference/get_post_ancestors
  * @global object $post The post object, if an ID is not supplied.
  *
- * @param int  $id Post ID, if you need to get the ancestor manually.
+ * @param int $id Post ID, if you need to get the ancestor manually.
  * @param array $args {
  *      Array of arguments. Optional.
  *
- * 	    $check_for_page   Whether to check for a page with a matching slug
- * 	    				  when on a posttype/taxonomy archive/single. Will also
- * 	    				  perform the check for pages with a slug of 'search' and '404'.
- * 	    				  Default 'true'.
- * 	    $post_type_pages  Pages to check for post types. Includes defaults for Search and 404.
+ *        $check_for_page   Whether to check for a page with a matching slug
+ *                          when on a posttype/taxonomy archive/single. Will also
+ *                          perform the check for pages with a slug of 'search' and '404'.
+ *                          Default 'true'.
+ *        $post_type_pages  Pages to check for post types. Includes defaults for Search and 404.
  * }
+ *
  * @return array  $ancestor {
  *      Ancestor array. Some values are separated out of the post/term object,
  *      because $post->post_title is different than $term->name
  *
- * 		int    $id           Ancestor ID
- *		string $title        Ancestor title
- *		string $name         Ancestor slug
- *		object $object       Ancestor post/term object
- *		int    $found_posts  Number of posts found, if this is a search results page.
+ *        int    $id           Ancestor ID
+ *        string $title        Ancestor title
+ *        string $name         Ancestor slug
+ *        object $object       Ancestor post/term object
+ *        int    $found_posts  Number of posts found, if this is a search results page.
  *
  * }
  */
-function cnp_get_highest_ancestor( $id='', $args=array() ) {
+function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 
 	// ID setup
 	global $post;
-	if ( '' === $id ) {
+	if ( '' === $id && ! empty( $post ) ) {
 		$id = $post->ID;
 	}
 
 	// Resolve Args
 	$defaults = array(
-		'check_for_page' => TRUE,
+		'check_for_page'  => true,
 		'post_type_pages' => array(
 			'search' => 'search',
 			'404'    => '404'
 		)
 	);
-	$vars = wp_parse_args( $args, $defaults );
+	$vars     = wp_parse_args( $args, $defaults );
 
 	$ancestor = array(
 		'id'     => 0,
 		'title'  => '',
 		'name'   => '',
-		'object' => FALSE
+		'object' => false
 	);
 
 	/*——————————————————————————————————————————————————————————
@@ -82,12 +83,11 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 
 	$post_type = get_post_type();
 
-	if ( FALSE !== $post_type ) {
+	if ( false !== $post_type ) {
 
 		if ( is_post_type_hierarchical( $post_type ) ) {
 			$ancestor_type = 'hierarchical_post_type';
-		}
-		else {
+		} else {
 			$ancestor_type = 'flat_post_type';
 		}
 	}
@@ -95,13 +95,9 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 	// Chain the home checks so that we're sure we've got the right one.
 	if ( is_front_page() && is_home() ) {
 		$ancestor_type = 'default_home';
-	}
-
-	elseif ( is_front_page() ) {
+	} elseif ( is_front_page() ) {
 		$ancestor_type = 'page_on_front';
-	}
-
-	elseif ( is_home() ) {
+	} elseif ( is_home() || is_singular('post') ) {
 		$ancestor_type = 'page_for_posts';
 	}
 
@@ -166,13 +162,13 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 
 			// Check for a post type page.
 			$post_type_page_obj = array();
-			if ( TRUE === $vars['check_for_page'] ) {
+			if ( true === $vars['check_for_page'] ) {
 
 				$post_type_page_obj = get_page_by_path( $post_type );
 
 			}
 
-			if ( !empty( $post_type_page_obj ) ) {
+			if ( ! empty( $post_type_page_obj ) ) {
 
 				$ancestor = array(
 					'id'     => $post_type_page_obj->ID,
@@ -181,9 +177,7 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 					'object' => $post_type_page_obj
 				);
 
-			}
-
-			// If a post type page doesn't exist, return the post type object.
+			} // If a post type page doesn't exist, return the post type object.
 			else {
 
 				$post_type_obj = get_post_type_object( $post_type );
@@ -210,7 +204,7 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 				'id'     => 0,
 				'title'  => 'home',
 				'name'   => 'Home',
-				'object' => FALSE
+				'object' => false
 			);
 
 			break;
@@ -219,7 +213,7 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 		case 'page_on_front':
 
 			$front_page = get_post( get_option( 'page_on_front' ) );
-			$ancestor = array(
+			$ancestor   = array(
 				'id'     => $front_page->ID,
 				'title'  => $front_page->post_title,
 				'name'   => $front_page->post_name,
@@ -232,11 +226,14 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 		case 'page_for_posts':
 
 			$page_for_posts = get_post( get_option( 'page_for_posts' ) );
-			$ancestor = array(
+			$ancestor       = array(
 				'id'     => $page_for_posts->ID
-			,	'title'  => $page_for_posts->post_title
-			,	'name'   => $page_for_posts->post_name
-			,	'object' => $page_for_posts
+			,
+				'title'  => $page_for_posts->post_title
+			,
+				'name'   => $page_for_posts->post_name
+			,
+				'object' => $page_for_posts
 			);
 
 			break;
@@ -247,7 +244,7 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 
 		case 'term':
 
-			$term = get_queried_object();
+			$term     = get_queried_object();
 			$ancestor = array(
 				'id'     => $term->term_id,
 				'title'  => $term->name,
@@ -265,13 +262,13 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 
 			// Check for search page first.
 			$search_page_obj = array();
-			if ( TRUE === $vars['check_for_page'] ) {
+			if ( true === $vars['check_for_page'] ) {
 
 				$search_page_obj = get_page_by_path( $vars['post_type_pages']['search'] );
 
 			}
 
-			if ( !empty( $search_page_obj ) ) {
+			if ( ! empty( $search_page_obj ) ) {
 
 				$ancestor = array(
 					'id'     => $search_page_obj->ID,
@@ -280,16 +277,14 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 					'object' => $search_page_obj
 				);
 
-			}
-
-			/// Return basic search information if page is not found.
+			} /// Return basic search information if page is not found.
 			else {
 
 				$ancestor = array(
 					'id'     => 0,
 					'title'  => 'Search Results',
 					'name'   => 'search',
-					'object' => FALSE
+					'object' => false
 				);
 
 			}
@@ -308,13 +303,13 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 
 			// Check for 404 page first
 			$page_404_obj = array();
-			if ( TRUE === $vars['check_for_page'] ) {
+			if ( true === $vars['check_for_page'] ) {
 
 				$page_404_obj = get_page_by_path( $vars['post_type_pages']['404'] );
 
 			}
 
-			if ( !empty( $page_404_obj ) ) {
+			if ( ! empty( $page_404_obj ) ) {
 
 				$ancestor = array(
 					'id'     => $page_404_obj->ID,
@@ -323,16 +318,14 @@ function cnp_get_highest_ancestor( $id='', $args=array() ) {
 					'object' => $page_404_obj
 				);
 
-			}
-
-			// Return basic 404 information if page is not found.
+			} // Return basic 404 information if page is not found.
 			else {
 
 				$ancestor = array(
 					'id'     => 0,
 					'title'  => 'Page Not Found',
 					'name'   => '404',
-					'object' => FALSE
+					'object' => false
 				);
 
 			}

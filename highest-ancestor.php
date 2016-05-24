@@ -66,7 +66,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 			'404'    => '404'
 		)
 	);
-	$vars     = wp_parse_args( $args, $defaults );
+	$vars = wp_parse_args( $args, $defaults );
 
 	$ancestor = array(
 		'id'     => 0,
@@ -97,7 +97,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 		$ancestor_type = 'default_home';
 	} elseif ( is_front_page() ) {
 		$ancestor_type = 'page_on_front';
-	} elseif ( is_home() || is_singular('post') ) {
+	} elseif ( is_home() || is_singular( 'post' ) ) {
 		$ancestor_type = 'page_for_posts';
 	}
 
@@ -164,7 +164,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 			$post_type_page_obj = array();
 			if ( true === $vars['check_for_page'] ) {
 
-				$post_type_page_obj = get_page_by_path( $post_type );
+				$post_type_page_obj = get_page_by_path( apply_filters('cnp_highest_ancestor_page_path', $post_type) );
 
 			}
 

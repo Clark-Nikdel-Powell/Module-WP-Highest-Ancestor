@@ -3,7 +3,7 @@
     "description": "A function for getting information about the highest ancestor of a post or term. Useful for section title information.",
     "type": "library",
     "license": "MIT",
-    "homepage": "https://github.com/Clark-Nikdel-Powell/Module-WP-Highest-Ancestor",
+    "homepage": "https://github.com/Clark-Nikdel-Powell/WP-Highest-Ancestor",
     "authors": [
         {
             "name": "Josh Nederveld",

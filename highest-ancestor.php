@@ -1,6 +1,7 @@
 <?php
+namespace CNP;
 /**
- * cnp_get_highest_ancestor
+ * get_highest_ancestor
  *
  * Gets information about the most distant ancestor of the current post.
  * Useful when displaying section information.
@@ -50,7 +51,7 @@
  *
  * }
  */
-function cnp_get_highest_ancestor( $id = '', $args = array() ) {
+function get_highest_ancestor( $id = '', $args = array() ) {
 
 	// ID setup
 	global $post;
@@ -63,16 +64,17 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 		'check_for_page'  => true,
 		'post_type_pages' => array(
 			'search' => 'search',
-			'404'    => '404'
-		)
+			'404'    => '404',
+		),
 	);
+
 	$vars = wp_parse_args( $args, $defaults );
 
 	$ancestor = array(
 		'id'     => 0,
 		'title'  => '',
 		'name'   => '',
-		'object' => false
+		'object' => false,
 	);
 
 	/*——————————————————————————————————————————————————————————
@@ -126,7 +128,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 		/  Posts
 		——————————————————————————————————————————————————————————————————————————————*/
 
-		// Hierarchicial post types return ancestor information.
+		// Hierarchical post types return ancestor information.
 		case 'hierarchical_post_type':
 
 			$ancestor_ids_arr = get_post_ancestors( $post );
@@ -151,7 +153,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 					'id'     => $post->ID,
 					'title'  => $post->post_title,
 					'name'   => $post->post_name,
-					'object' => $post
+					'object' => $post,
 				);
 			}
 
@@ -164,7 +166,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 			$post_type_page_obj = array();
 			if ( true === $vars['check_for_page'] ) {
 
-				$post_type_page_obj = get_page_by_path( apply_filters('cnp_highest_ancestor_page_path', $post_type) );
+				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $post_type ) );
 
 			}
 
@@ -174,7 +176,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 					'id'     => $post_type_page_obj->ID,
 					'title'  => $post_type_page_obj->post_title,
 					'name'   => $post_type_page_obj->post_name,
-					'object' => $post_type_page_obj
+					'object' => $post_type_page_obj,
 				);
 
 			} // If a post type page doesn't exist, return the post type object.
@@ -186,7 +188,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 					'id'     => 0,
 					'title'  => $post_type_obj->label,
 					'name'   => $post_type_obj->name,
-					'object' => $post_type_obj
+					'object' => $post_type_obj,
 				);
 
 			}
@@ -204,7 +206,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 				'id'     => 0,
 				'title'  => 'home',
 				'name'   => 'Home',
-				'object' => false
+				'object' => false,
 			);
 
 			break;
@@ -217,7 +219,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 				'id'     => $front_page->ID,
 				'title'  => $front_page->post_title,
 				'name'   => $front_page->post_name,
-				'object' => $front_page
+				'object' => $front_page,
 			);
 
 			break;
@@ -227,13 +229,10 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 
 			$page_for_posts = get_post( get_option( 'page_for_posts' ) );
 			$ancestor       = array(
-				'id'     => $page_for_posts->ID
-			,
-				'title'  => $page_for_posts->post_title
-			,
-				'name'   => $page_for_posts->post_name
-			,
-				'object' => $page_for_posts
+				'id'     => $page_for_posts->ID,
+				'title'  => $page_for_posts->post_title,
+				'name'   => $page_for_posts->post_name,
+				'object' => $page_for_posts,
 			);
 
 			break;
@@ -249,7 +248,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 				'id'     => $term->term_id,
 				'title'  => $term->name,
 				'name'   => $term->slug,
-				'object' => $term
+				'object' => $term,
 			);
 
 			break;
@@ -274,7 +273,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 					'id'     => $search_page_obj->ID,
 					'title'  => $search_page_obj->post_title,
 					'name'   => $search_page_obj->post_name,
-					'object' => $search_page_obj
+					'object' => $search_page_obj,
 				);
 
 			} /// Return basic search information if page is not found.
@@ -284,7 +283,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 					'id'     => 0,
 					'title'  => 'Search Results',
 					'name'   => 'search',
-					'object' => false
+					'object' => false,
 				);
 
 			}
@@ -315,7 +314,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 					'id'     => $page_404_obj->ID,
 					'title'  => $page_404_obj->post_title,
 					'name'   => $page_404_obj->post_name,
-					'object' => $page_404_obj
+					'object' => $page_404_obj,
 				);
 
 			} // Return basic 404 information if page is not found.
@@ -325,7 +324,7 @@ function cnp_get_highest_ancestor( $id = '', $args = array() ) {
 					'id'     => 0,
 					'title'  => 'Page Not Found',
 					'name'   => '404',
-					'object' => false
+					'object' => false,
 				);
 
 			}

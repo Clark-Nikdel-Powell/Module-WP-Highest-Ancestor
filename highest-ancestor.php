@@ -166,7 +166,7 @@ function get_highest_ancestor( $id = '', $args = array() ) {
 			$post_type_page_obj = array();
 			if ( true === $vars['check_for_page'] ) {
 
-				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $post_type ) );
+				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $vars['post_type_pages'][ $post_type ] ) );
 
 			}
 

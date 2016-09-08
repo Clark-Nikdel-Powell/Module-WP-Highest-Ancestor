@@ -24,13 +24,13 @@ namespace CNP;
  * Note to self-- we could have a way to register different
  * titles, like you would register labels for a post type.
  *
- * @see get_post_ancestors()
+ * @see  get_post_ancestors()
  * @link https://codex.wordpress.org/Function_Reference/get_post_ancestors
  * @global object $post The post object, if an ID is not supplied.
  *
- * @param int $id Post ID, if you need to get the ancestor manually.
- * @param array $args {
- *      Array of arguments. Optional.
+ * @param int     $id   Post ID, if you need to get the ancestor manually.
+ * @param array   $args {
+ *                      Array of arguments. Optional.
  *
  *        $check_for_page   Whether to check for a page with a matching slug
  *                          when on a posttype/taxonomy archive/single. Will also
@@ -164,9 +164,10 @@ function get_highest_ancestor( $id = '', $args = array() ) {
 
 			// Check for a post type page.
 			$post_type_page_obj = array();
-			if ( true === $vars['check_for_page'] && isset( $vars['post_type_pages'][ $post_type ] ) ) {
+			if ( true === $vars['check_for_page'] ) {
 
-				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $vars['post_type_pages'][ $post_type ] ) );
+				$post_type_arg      = isset( $vars['post_type_pages'][ $post_type ] ) ? $vars['post_type_pages'][ $post_type ] : '';
+				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $post_type_arg ) );
 
 			}
 

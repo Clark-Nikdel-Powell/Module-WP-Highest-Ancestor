@@ -24,13 +24,13 @@ namespace CNP;
  * Note to self-- we could have a way to register different
  * titles, like you would register labels for a post type.
  *
- * @see get_post_ancestors()
+ * @see  get_post_ancestors()
  * @link https://codex.wordpress.org/Function_Reference/get_post_ancestors
  * @global object $post The post object, if an ID is not supplied.
  *
  * @param int $id Post ID, if you need to get the ancestor manually.
  * @param array $args {
- *      Array of arguments. Optional.
+ *                      Array of arguments. Optional.
  *
  *        $check_for_page   Whether to check for a page with a matching slug
  *                          when on a posttype/taxonomy archive/single. Will also
@@ -69,6 +69,8 @@ function get_highest_ancestor( $id = '', $args = array() ) {
 	);
 
 	$vars = wp_parse_args( $args, $defaults );
+
+	$vars = apply_filters( 'cnp_highest_ancestor_args', $vars );
 
 	$ancestor = array(
 		'id'     => 0,
@@ -131,30 +133,52 @@ function get_highest_ancestor( $id = '', $args = array() ) {
 		// Hierarchical post types return ancestor information.
 		case 'hierarchical_post_type':
 
-			$ancestor_ids_arr = get_post_ancestors( $post );
+			// Check for a post type page.
+			$post_type_page_obj = array();
+			if ( true === $vars['check_for_page'] ) {
 
-			// The highest level ancestor is returned as the last
-			// value in the array, so we take that with array_pop.
-			if ( ! empty( $ancestor_ids_arr ) ) {
+				$post_type_arg      = isset( $vars['post_type_pages'][ $post_type ] ) ? $vars['post_type_pages'][ $post_type ] : '';
+				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $post_type_arg ) );
 
-				$ancestor_id       = array_pop( $ancestor_ids_arr );
-				$ancestor_post_obj = get_post( $ancestor_id );
+			}
 
-				$ancestor = array(
-					'id'     => $ancestor_post_obj->ID,
-					'title'  => $ancestor_post_obj->post_title,
-					'name'   => $ancestor_post_obj->post_name,
-					'object' => $ancestor_post_obj,
-				);
-
-			} else {
+			if ( ! empty( $post_type_page_obj ) ) {
 
 				$ancestor = array(
-					'id'     => $post->ID,
-					'title'  => $post->post_title,
-					'name'   => $post->post_name,
-					'object' => $post,
+					'id'     => $post_type_page_obj->ID,
+					'title'  => $post_type_page_obj->post_title,
+					'name'   => $post_type_page_obj->post_name,
+					'object' => $post_type_page_obj,
 				);
+
+			} // If a post type page doesn't exist, return the post type object.
+			else {
+
+				$ancestor_ids_arr = get_post_ancestors( $post );
+
+				// The highest level ancestor is returned as the last
+				// value in the array, so we take that with array_pop.
+				if ( ! empty( $ancestor_ids_arr ) ) {
+
+					$ancestor_id       = array_pop( $ancestor_ids_arr );
+					$ancestor_post_obj = get_post( $ancestor_id );
+
+					$ancestor = array(
+						'id'     => $ancestor_post_obj->ID,
+						'title'  => $ancestor_post_obj->post_title,
+						'name'   => $ancestor_post_obj->post_name,
+						'object' => $ancestor_post_obj,
+					);
+
+				} else {
+
+					$ancestor = array(
+						'id'     => $post->ID,
+						'title'  => $post->post_title,
+						'name'   => $post->post_name,
+						'object' => $post,
+					);
+				}
 			}
 
 			break;
@@ -164,9 +188,10 @@ function get_highest_ancestor( $id = '', $args = array() ) {
 
 			// Check for a post type page.
 			$post_type_page_obj = array();
-			if ( true === $vars['check_for_page'] && isset( $vars['post_type_pages'][ $post_type ] ) ) {
+			if ( true === $vars['check_for_page'] ) {
 
-				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $vars['post_type_pages'][ $post_type ] ) );
+				$post_type_arg      = isset( $vars['post_type_pages'][ $post_type ] ) ? $vars['post_type_pages'][ $post_type ] : '';
+				$post_type_page_obj = get_page_by_path( apply_filters( 'cnp_highest_ancestor_page_path', $post_type_arg ) );
 
 			}
 
